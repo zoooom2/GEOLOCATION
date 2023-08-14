@@ -8,8 +8,9 @@ import {
 import { EditControl } from 'react-leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { useState, useRef, useEffect } from 'react';
-import { LatLng, LayerEvent, LayersControlEvent, LeafletEvent } from 'leaflet';
+import { useState, useEffect } from 'react';
+import { LatLng } from 'leaflet';
+import axios from 'axios';
 
 type EditLayer = {
   _leaflet_id: number;
@@ -21,7 +22,6 @@ const GeoMap = () => {
   const [mapLayers, setMapLayers] = useState<
     Array<{ id: number; latlngs: Array<LatLng> }>
   >([]);
-  const mapRef = useRef();
 
   useEffect(() => {
     // Get user's geolocation and set it as the default center
@@ -45,8 +45,20 @@ const GeoMap = () => {
     }
   }, []);
 
-  const _onCreated = (e) => {
+  const getCenter = (arr: [[number, number]]) => {
+    const center = arr.reduce(
+      (acc, val) => [acc[0] + val[0], acc[1] + val[1]],
+      [0, 0]
+    );
+    console.log(arr);
+    center[0] /= arr.length;
+    center[1] /= arr.length;
+    return center;
+  };
+
+  const _onCreated = async (e) => {
     const { layer, layerType } = e;
+
     if (layerType === 'polygon') {
       const { _leaflet_id } = layer;
       setMapLayers((layers) => [
@@ -54,6 +66,19 @@ const GeoMap = () => {
         { id: _leaflet_id, latlngs: layer._latlngs[0] },
       ]);
     }
+    const vertices = layer._latlngs[0].map(
+      (p: { lat: number; lng: number }) => [p.lat, p.lng]
+    ) as [[number, number]];
+
+    const center = getCenter(vertices);
+
+    await axios.post('http://localhost:2705/api/v1/location/', {
+      uid: layer._leaflet_id,
+      polygon: {
+        vertices: { type: 'Polygon', coordinates: vertices },
+        center: { type: 'Point', coordinates: center },
+      },
+    });
   };
   const _onEdited = (e) => {
     const {

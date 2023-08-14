@@ -41,11 +41,11 @@ router.get('/me', getMe, getUser);
 router.patch('/updateMe', uploadPhoto([], 'user'), updateMe);
 router.delete('/deleteMe', deleteMe);
 
-router.use(restrictTo('admin'));
+router.use(restrictTo('admin,master'));
 router.route(createUser);
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
-router.use(restrictTo('master'));
+// router.use(restrictTo('master'));
 router.route('/').get(getAllUsers);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 {
-  "name": "MAXFENCE",
+  "name": "maxfence",
   "version": "1.0.0",
   "description": "A bead ecommerce website",
   "main": "app.js",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
+    "@turf/turf": "^6.5.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",

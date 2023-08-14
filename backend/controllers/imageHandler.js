@@ -37,11 +37,12 @@ const cloudUpload = (location) =>
 
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
-exports.uploadPhoto = ([uploadType], type) => {
+exports.uploadPhoto = ([entry, uploadType], type) => {
   if (uploadType && uploadType === 'multerUpload') {
-    return upload.single('image');
+    return upload.single(entry);
   }
-  return cloudUpload(type).single('image');
+
+  return cloudUpload(type).single(entry);
 };
 exports.multiplePhotos = ([entries, uploadType], type) => {
   if (uploadType && uploadType === 'multerUpload') {

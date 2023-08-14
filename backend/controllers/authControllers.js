@@ -5,6 +5,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const { sendMail } = require('../utils/email');
+const ClientProfile = require('../models/clientModel');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -18,8 +19,8 @@ const createSendToken = (user, statusCode, req, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'lax',
+    // secure: true,
   });
 
   // Remove password from output
@@ -28,14 +29,13 @@ const createSendToken = (user, statusCode, req, res) => {
   res.status(statusCode).json({
     status: 'success',
     token,
-    data: {
-      user,
-    },
+    user,
   });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
   // const SID = short
+
   const newUser = await User.create({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
@@ -44,7 +44,14 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
+    companyID: req.body.companyID,
   });
+
+  if (req.body.role === 'user') {
+    await ClientProfile.findByIdAndUpdate(req.body.companyID, {
+      $push: { users: newUser._id },
+    });
+  }
 
   const url = `${req.protocol}://${req.get('host')}/me`;
   const options = {
@@ -55,7 +62,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     html: `<p>You're welcome MAXFENCE. Click on the link below to view your profile<br />
     <a href=${url}>Click here to view profile</a></p>`,
   };
-  await sendMail(options);
+  // await sendMail(options);
 
   createSendToken(newUser, 201, req, res);
 });

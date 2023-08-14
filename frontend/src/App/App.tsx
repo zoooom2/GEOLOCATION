@@ -1,31 +1,54 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import GoogleMaps from '../../components/googleMap';
+// import GoogleMaps from '../../components/googleMap';
 import GeoMap from '../../components/geoMap';
 import '../App.css';
+import LoginPage from '../page/LoginPage';
+import { useAppDispatch, useAppSelector } from './hooks';
+import { fetchProfile } from '../features/userFeature/userSlice';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const {
+    user: { user },
+  } = useAppSelector((user) => user);
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const newSocket = io();
-    setSocket(newSocket);
-    return () => {
-      newSocket.disconnect();
-    };
+    dispatch(fetchProfile()).then(() => {
+      const newSocket = io('http://localhost:2705/');
+      setSocket(newSocket);
+      return () => {
+        newSocket.disconnect();
+      };
+    });
   }, []);
 
   useEffect(() => {
     let watchId: number | null;
-    if (socket) {
+    console.log('movement');
+
+    if (socket && user.companyID) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
-          socket.emit('locationUpdate', { latitude, longitude });
+          socket.emit('locationUpdate', {
+            latitude,
+            longitude,
+            companyID: user.companyID,
+            userID: user._id,
+          });
         },
         (error) => {
           console.error('Error getting location', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000, // 10 seconds
+          maximumAge: 0,
         }
       );
     }
@@ -34,13 +57,17 @@ function App() {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [socket]);
+  }, [socket, user.companyID, user._id]);
 
   return (
-    <>
-      <GeoMap />
+    <Router>
+      <Routes>
+        <Route path='/' element={<GeoMap />} />
+        <Route path='/auth' element={<LoginPage />} />
+      </Routes>
+
       {/* <GoogleMaps /> 0*/}
-    </>
+    </Router>
   );
 }
 

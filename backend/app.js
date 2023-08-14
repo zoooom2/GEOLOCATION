@@ -13,6 +13,8 @@ const MongoStore = require('connect-mongo');
 const compression = require('compression');
 const cors = require('cors');
 const userRouter = require('./routes/userRoute');
+const clientRouter = require('./routes/clientRoutes');
+const geoRouter = require('./routes/geoRoutes');
 
 require('./controllers/passport')(passport);
 const AppError = require('./utils/appError');
@@ -21,13 +23,13 @@ const globalErrorHandler = require('./controllers/errorController');
 // Start express app
 const app = express();
 
-app.enable('trust proxy');
+// app.enable('trust proxy');
 
 // 1) GLOBAL MIDDLEWARES
 // Implement CORS
 app.use(
   cors({
-    origin: `http://localhost:5173`,
+    origin: 'http://localhost:5173',
     methods: 'GET,POST,PATCH,DELETE',
     credentials: true,
   }),
@@ -117,6 +119,8 @@ app.use((req, res, next) => {
 
 // 3) ROUTES
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/clients', clientRouter);
+app.use('/api/v1/location', geoRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const { model, Schema } = mongoose;
+const { model, Schema, ObjectId } = mongoose;
 
 const userSchema = new Schema({
   firstname: {
@@ -32,6 +32,10 @@ const userSchema = new Schema({
       message: '{VALUE} is not a valid mobile phone number',
     },
   },
+  companyID: {
+    type: ObjectId,
+    ref: 'ClientProfile',
+  },
   photo: {
     type: String,
   },
@@ -46,6 +50,14 @@ const userSchema = new Schema({
     minlength: 8,
     select: false,
   },
+  currentLocation: { type: ObjectId, ref: 'GeoFence' }, // to know where the user is currently
+  locationHistory: [
+    {
+      location: { type: ObjectId, ref: 'GeoFence' },
+      checkInTime: { type: Date, required: true, default: Date.now() },
+      checkOutTime: { type: Date, required: true, default: Date.now() },
+    },
+  ],
   passwordConfirm: {
     type: String,
     lowercase: true,

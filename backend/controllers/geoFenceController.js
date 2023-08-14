@@ -1,26 +1,29 @@
 /* eslint-disable no-plusplus */
-const GeoFence = require('../models/geoFenceModel');
+const { default: mongoose } = require('mongoose');
+const Geofence = require('../models/geoFenceModel');
+const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 
-let io;
+// let io;
 
-exports.setIo = (socketIo) => {
-  io = socketIo;
-};
+// exports.setIo = (socketIo) => {
+//   io = socketIo;
+// };
 
 const isPointInsidePolygon = (point, polygon) => {
   const x = point.longitude;
   const y = point.latitude;
   let isInside = false;
+
   for (
-    let i = 0, j = polygon.vertices.length - 1;
+    let i = 0, j = polygon.vertices.coordinates.length - 1;
     i < polygon.vertices.length;
     j = i++
   ) {
-    const xi = polygon.vertices[i].longitude;
-    const yi = polygon.vertices[i].latitude;
-    const xj = polygon.vertices[j].longitude;
-    const yj = polygon.vertices[j].latitude;
+    const xi = polygon.vertices.coordinates[i].longitude;
+    const yi = polygon.vertices.coordinates[i].latitude;
+    const xj = polygon.vertices.coordinates[j].longitude;
+    const yj = polygon.vertices.coordinates[j].latitude;
 
     const intersect =
       yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
@@ -32,25 +35,36 @@ const isPointInsidePolygon = (point, polygon) => {
 };
 
 exports.createGeoFence = catchAsync(async (req, res) => {
-  const { companyName, polygon } = req.body;
-  const newLocation = await GeoFence.create({ companyName, polygon });
+  const newLocation = await Geofence.create({
+    companyID: req.user.companyID,
+    polygon: req.body.polygon,
+    uid: req.body.uid,
+  });
   res.status(201).json(newLocation);
 });
 
-exports.updateLocation = catchAsync(async (req, res) => {
-  const { latitude, longitude } = req.body;
-  const userLocation = { latitude, longitude };
-  io.emit('locationUpdate', userLocation);
-  res.status(200).json(userLocation);
-});
+exports.checkLocation = async (data) => {
+  // find polygons based on the company the user belong to
+  const companyID = new mongoose.Types.ObjectId(data.companyID);
 
-exports.checkLocation = catchAsync(async (req, res) => {
-  const { latitude, longitude, companyName } = req.body;
-  const userLocation = { latitude, longitude };
-  const locations = await GeoFence.find({ companyName });
+  const polygons = await Geofence.find({
+    companyID,
+  });
 
-  const insidePerimeters = locations.filter((location) =>
-    isPointInsidePolygon(userLocation, location),
+  console.log(polygons);
+
+  // check if the position is inside the geofence
+  const insidePerimeters = polygons.filter(({ polygon }) =>
+    isPointInsidePolygon(
+      { longitude: data.longitude, latitude: data.latitude },
+      polygon,
+    ),
   );
-  res.json(insidePerimeters);
-});
+
+  console.log(insidePerimeters);
+
+  // // return insidePerimeters;
+  if (insidePerimeters) {
+    User.findByIdAndUpdate(data.userID, {});
+  }
+};

@@ -23,13 +23,34 @@ mongoose.connect(DB).then(() => {
 });
 
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+  allowEIO3: true,
+});
 
 const geoFenceController = require('./controllers/geoFenceController');
 
-geoFenceController.setIo(io);
+// geoFenceController.setIo(io);
 
 const port = process.env.PORT || 2705;
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+
+  socket.on('locationUpdate', (data) => {
+    // Broadcast the location update to all connected clients
+    // io.emit('locationUpdate', data);
+    geoFenceController.checkLocation(data);
+  });
+});
+
 const server = httpServer.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
