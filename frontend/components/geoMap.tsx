@@ -4,13 +4,17 @@ import {
   Marker,
   Popup,
   FeatureGroup,
+  Polygon,
 } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { useState, useEffect } from 'react';
 import { LatLng } from 'leaflet';
 import axios from 'axios';
+import { useAppSelector } from '../src/App/hooks';
 
 type EditLayer = {
   _leaflet_id: number;
@@ -18,6 +22,7 @@ type EditLayer = {
 };
 
 const GeoMap = () => {
+  const { companyGeoFences } = useAppSelector((user) => user.user);
   const [center, setCenter] = useState({ lat: 8, lng: 7 });
   const [mapLayers, setMapLayers] = useState<
     Array<{ id: number; latlngs: Array<LatLng> }>
@@ -50,7 +55,6 @@ const GeoMap = () => {
       (acc, val) => [acc[0] + val[0], acc[1] + val[1]],
       [0, 0]
     );
-    console.log(arr);
     center[0] /= arr.length;
     center[1] /= arr.length;
     return center;
@@ -94,15 +98,25 @@ const GeoMap = () => {
         )
       );
     });
+
+    // find the polygon by its uid and patch it
+
+    // await axios.patch('http://localhost:2705/api/v1/location')
   };
-  const _onDeleted = (e) => {
+  const _onDeleted = async (e) => {
     const {
       layers: { _layers },
     } = e;
     Object.values<{ _leaflet_id: number }>(_layers).map(({ _leaflet_id }) => {
       setMapLayers((layers) => layers.filter((l) => l.id !== _leaflet_id));
     });
+
+    // find the polygon by its uid and delete it
+
+    // await axios.delete()
   };
+  // implement find address by search and also the ability to show the address of a place when it is clicked on the map
+  // find a central point of all the polygons and make it the center of the map
 
   return (
     <>
@@ -130,9 +144,17 @@ const GeoMap = () => {
           attribution='maxFence'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
-        <Marker position={[center.lat, center.lng]}>
-          <Popup>This is your location</Popup>
-        </Marker>
+        <MarkerClusterGroup>
+          {companyGeoFences.map((fence, index) => (
+            <>
+              <Polygon key={index} positions={fence.vertices.coordinates} />
+              <Marker position={fence.center.coordinates} />
+            </>
+          ))}
+          <Marker position={[center.lat, center.lng]}>
+            <Popup>This is your location</Popup>
+          </Marker>
+        </MarkerClusterGroup>
       </MapContainer>
       <pre style={{ textAlign: 'left' }}>{JSON.stringify(mapLayers, 1, 2)}</pre>
     </>

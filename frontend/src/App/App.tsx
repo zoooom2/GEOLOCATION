@@ -6,7 +6,7 @@ import GeoMap from '../../components/geoMap';
 import '../App.css';
 import LoginPage from '../page/LoginPage';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { fetchProfile } from '../features/userFeature/userSlice';
+import { fetchFences, fetchProfile } from '../features/userFeature/userSlice';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -17,13 +17,17 @@ function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchProfile()).then(() => {
-      const newSocket = io('http://localhost:2705/');
-      setSocket(newSocket);
-      return () => {
-        newSocket.disconnect();
-      };
-    });
+    dispatch(fetchProfile())
+      .then(() => {
+        dispatch(fetchFences());
+      })
+      .then(() => {
+        const newSocket = io('http://localhost:2705/');
+        setSocket(newSocket);
+        return () => {
+          newSocket.disconnect();
+        };
+      });
   }, []);
 
   useEffect(() => {
@@ -38,8 +42,7 @@ function App() {
           socket.emit('locationUpdate', {
             latitude,
             longitude,
-            companyID: user.companyID,
-            userID: user._id,
+            user,
           });
         },
         (error) => {

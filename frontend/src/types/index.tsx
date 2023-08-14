@@ -1,6 +1,8 @@
 //Axios Request Types
 // export type AxiosResponseType = Awaited<ReturnType<typeof axios.get>>['data'];
 
+import { LatLng } from 'leaflet';
+
 // import { SyntheticEvent } from 'react';
 // import { IconType } from 'react-icons';
 
@@ -15,6 +17,7 @@ export type UserType = {
   photo: string;
   role: string;
   currentLocation: string;
+
   locationHistory: {
     location: string;
     checkInTime: Date;
@@ -30,7 +33,12 @@ export type UserStateType = {
   loading: boolean;
   isAuthenticated: boolean;
   authentication_error: string;
+  fetch_fences_error: string;
   user: UserType;
+  companyGeoFences: {
+    vertices: { type: 'Polygon'; coordinates: LatLng[][] };
+    center: { type: 'Point'; coordinates: LatLng };
+  }[];
   imageFile: {
     file?: File;
     filePreview?: string;
