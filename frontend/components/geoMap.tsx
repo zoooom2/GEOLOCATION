@@ -7,14 +7,20 @@ import {
   Polygon,
 } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
-import 'react-leaflet-markercluster/dist/styles.min.css';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { LatLng } from 'leaflet';
-import axios from 'axios';
-import { useAppSelector } from '../src/App/hooks';
+
+import { useAppDispatch, useAppSelector } from '../src/App/hooks';
+import {
+  createFence,
+  deleteFenceByUID,
+  setCenter,
+  setMapLayers,
+  updateFenceByUID,
+} from '../src/features/geoFeatures/geoSlice';
 
 type EditLayer = {
   _leaflet_id: number;
@@ -22,31 +28,36 @@ type EditLayer = {
 };
 
 const GeoMap = () => {
-  const { companyGeoFences } = useAppSelector((user) => user.user);
-  const [center, setCenter] = useState({ lat: 8, lng: 7 });
-  const [mapLayers, setMapLayers] = useState<
-    Array<{ id: number; latlngs: Array<LatLng> }>
-  >([]);
+  const { companyGeoFences } = useAppSelector((state) => state.user);
+  const { center, mapLayers } = useAppSelector((state) => state.geo);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
+    //load the map layers
+    const loadedLayers = companyGeoFences.map((layer) => ({
+      id: layer.uid,
+      latlngs: layer.vertices.coordinates,
+    }));
+    dispatch(setMapLayers(loadedLayers));
+
     // Get user's geolocation and set it as the default center
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setCenter({ lat, lng });
+          dispatch(setCenter({ lat, lng }));
         },
         (error) => {
           console.error('Error getting location:', error);
           // Set a default center in case geolocation fails
-          setCenter({ lat: 51.505, lng: -0.09 });
+          dispatch(setCenter({ lat: 51.505, lng: -0.09 }));
         }
       );
     } else {
       console.error('Geolocation is not available in this browser');
       // Set a default center if geolocation is not available
-      setCenter({ lat: 51.505, lng: -0.09 });
+      dispatch(setCenter({ lat: 51.505, lng: -0.09 }));
     }
   }, []);
 
@@ -65,10 +76,12 @@ const GeoMap = () => {
 
     if (layerType === 'polygon') {
       const { _leaflet_id } = layer;
-      setMapLayers((layers) => [
-        ...layers,
-        { id: _leaflet_id, latlngs: layer._latlngs[0] },
-      ]);
+      dispatch(
+        setMapLayers((layers: { id: number; latlngs: Array<LatLng> }[]) => [
+          ...layers,
+          { id: _leaflet_id, latlngs: layer._latlngs[0] },
+        ])
+      );
     }
     const vertices = layer._latlngs[0].map(
       (p: { lat: number; lng: number }) => [p.lat, p.lng]
@@ -76,48 +89,56 @@ const GeoMap = () => {
 
     const center = getCenter(vertices);
 
-    await axios.post('http://localhost:2705/api/v1/location/', {
-      uid: layer._leaflet_id,
-      polygon: {
-        vertices: { type: 'Polygon', coordinates: vertices },
-        center: { type: 'Point', coordinates: center },
-      },
-    });
+    //add fence to database
+    dispatch(createFence({ layer, vertices, center }));
   };
+
   const _onEdited = (e) => {
     const {
       layers: { _layers },
     } = e;
 
     Object.values<EditLayer>(_layers).map(({ _leaflet_id, editing }) => {
-      setMapLayers((layers) =>
-        layers.map((l) =>
-          l.id === _leaflet_id
-            ? { ...l, latlngs: { ...editing.latlngs[0] } }
-            : l
+      dispatch(
+        setMapLayers((layers: { id: number; latlngs: Array<LatLng> }[]) =>
+          layers.map((l) => {
+            if (l.id === _leaflet_id) {
+              return { ...l, latlngs: { ...editing.latlngs[0] } };
+            } else {
+              return l;
+            }
+          })
         )
       );
+
+      // update the database in the database
+      const vertices = editing.latlngs[0].map(
+        (p: { lat: number; lng: number }) => [p.lat, p.lng]
+      ) as [[number, number]];
+      const center = getCenter(vertices);
+
+      dispatch(updateFenceByUID({ uid: _leaflet_id, vertices, center }));
     });
-
-    // find the polygon by its uid and patch it
-
-    // await axios.patch('http://localhost:2705/api/v1/location')
   };
+
   const _onDeleted = async (e) => {
     const {
       layers: { _layers },
     } = e;
     Object.values<{ _leaflet_id: number }>(_layers).map(({ _leaflet_id }) => {
-      setMapLayers((layers) => layers.filter((l) => l.id !== _leaflet_id));
+      dispatch(
+        setMapLayers((layers: { id: number; latlngs: Array<LatLng> }[]) =>
+          layers.filter((l) => l.id !== _leaflet_id)
+        )
+      );
+
+      //delete the fence from the database
+      dispatch(deleteFenceByUID({ uid: _leaflet_id }));
     });
-
-    // find the polygon by its uid and delete it
-
-    // await axios.delete()
   };
+
   // implement find address by search and also the ability to show the address of a place when it is clicked on the map
   // find a central point of all the polygons and make it the center of the map
-
   return (
     <>
       <MapContainer
@@ -132,6 +153,7 @@ const GeoMap = () => {
             onEdited={_onEdited}
             onDeleted={_onDeleted}
             draw={{
+              polygon: true,
               rectangle: false,
               polyline: false,
               circle: false,
@@ -144,7 +166,7 @@ const GeoMap = () => {
           attribution='maxFence'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
-        <MarkerClusterGroup>
+        <MarkerClusterGroup chunkedLoading>
           {companyGeoFences.map((fence, index) => (
             <>
               <Polygon key={index} positions={fence.vertices.coordinates} />

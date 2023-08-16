@@ -36,7 +36,8 @@ export type UserStateType = {
   fetch_fences_error: string;
   user: UserType;
   companyGeoFences: {
-    vertices: { type: 'Polygon'; coordinates: LatLng[][] };
+    uid: number;
+    vertices: { type: 'Polygon'; coordinates: LatLng[] };
     center: { type: 'Point'; coordinates: LatLng };
   }[];
   imageFile: {

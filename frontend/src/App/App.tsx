@@ -6,7 +6,8 @@ import GeoMap from '../../components/geoMap';
 import '../App.css';
 import LoginPage from '../page/LoginPage';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { fetchFences, fetchProfile } from '../features/userFeature/userSlice';
+import { fetchProfile } from '../features/userFeature/userSlice';
+import { fetchFences } from '../features/geoFeatures/geoSlice';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);

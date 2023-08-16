@@ -1,11 +1,17 @@
 const express = require('express');
-const { createGeoFence } = require('../controllers/geoFenceController');
+const {
+  createGeoFence,
+  getFenceByCompanyID,
+  updateFenceByUID,
+  deleteFenceByUID,
+} = require('../controllers/geoFenceController');
 const { protect } = require('../controllers/authControllers');
 
 const router = express.Router();
 
 router.use(protect);
 
-router.post('/', createGeoFence);
+router.route('/').post(createGeoFence).get(getFenceByCompanyID);
+router.route('/:uid').patch(updateFenceByUID).delete(deleteFenceByUID);
 
 module.exports = router;
