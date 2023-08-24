@@ -2,25 +2,43 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 // import GoogleMaps from '../../components/googleMap';
-import GeoMap from '../../components/geoMap';
+// import GeoMap from '../components/geoMap';
 import '../App.css';
 import LoginPage from '../page/LoginPage';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { fetchProfile } from '../features/userFeature/userSlice';
-import { fetchFences } from '../features/geoFeatures/geoSlice';
+import { fetchFences, setCenter } from '../features/geoFeatures/geoSlice';
+import GoogleMap from '../components/googleMap';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const {
-    user: { user },
-  } = useAppSelector((user) => user);
+  const { user } = useAppSelector((state) => state.user);
+  const { companyGeoFences } = useAppSelector((state) => state.geo);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchProfile())
+      .then(() => dispatch(fetchFences()))
       .then(() => {
-        dispatch(fetchFences());
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              dispatch(setCenter({ lat, lng }));
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+              // Set a default center in case geolocation fails
+              dispatch(setCenter({ lat: 51.505, lng: -0.09 }));
+            }
+          );
+        } else {
+          console.error('Geolocation is not available in this browser');
+          // Set a default center if geolocation is not available
+          dispatch(setCenter({ lat: 51.505, lng: -0.09 }));
+        }
       })
       .then(() => {
         const newSocket = io('http://localhost:2705/');
@@ -29,11 +47,11 @@ function App() {
           newSocket.disconnect();
         };
       });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     let watchId: number | null;
-    console.log('movement');
+    // console.log('movement');
 
     if (socket && user.companyID) {
       watchId = navigator.geolocation.watchPosition(
@@ -61,16 +79,15 @@ function App() {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [socket, user.companyID, user._id]);
+  }, [socket, user]);
 
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<GeoMap />} />
+        <Route path='/' element={<GoogleMap />} />
+        {/* <Route path='/' element={<GeoMap />} /> */}
         <Route path='/auth' element={<LoginPage />} />
       </Routes>
-
-      {/* <GoogleMaps /> 0*/}
     </Router>
   );
 }

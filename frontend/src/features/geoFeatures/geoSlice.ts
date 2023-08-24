@@ -1,22 +1,20 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { LatLng } from 'leaflet';
+// import { LatLng } from 'leaflet';
+import { GeoStateType } from '../../types';
 
 export const createFence = createAsyncThunk(
   'geo/createFence',
   async ({
-    layer,
     vertices,
     center,
   }: {
     center: [number, number];
-    vertices: [[number, number]];
-    layer: { _leaflet_id: number };
+    vertices: Array<[number, number]>;
   }) => {
     const response = await axios.post(
       'http://localhost:2705/api/v1/location/',
       {
-        uid: layer._leaflet_id,
         polygon: {
           vertices: { type: 'Polygon', coordinates: vertices },
           center: { type: 'Point', coordinates: center },
@@ -29,7 +27,7 @@ export const createFence = createAsyncThunk(
 
 export const fetchFences = createAsyncThunk('geo/fetchFences', async () => {
   const response = await axios.get(`http://localhost:2705/api/v1/location/`);
-  console.log(response.data);
+
   return response.data;
 });
 
@@ -40,7 +38,7 @@ export const updateFenceByUID = createAsyncThunk(
     vertices,
     center,
   }: {
-    uid: number;
+    uid: string;
     center: [number, number];
     vertices: [[number, number]];
   }) => {
@@ -56,7 +54,7 @@ export const updateFenceByUID = createAsyncThunk(
 );
 export const deleteFenceByUID = createAsyncThunk(
   'geo/deleteFenceByUID',
-  async ({ uid }: { uid: number }) => {
+  async ({ uid }: { uid: string }) => {
     const response = await axios.delete(
       `http://localhost:2705/api/v1/location/${uid}`
     );
@@ -64,41 +62,37 @@ export const deleteFenceByUID = createAsyncThunk(
   }
 );
 
-export type GeoStateType = {
-  loading: boolean;
-  companyGeoFences: {
-    uid: number;
-    vertices: {
-      type: 'Polygon';
-      coordinates: LatLng[];
-    };
-    center: {
-      type: 'Point';
-      coordinates: LatLng;
-    }[];
-  }[];
-  fetch_fences_error: string;
-  center: LatLng;
-  mapLayers: Array<{ id: number; latlngs: Array<LatLng> }>;
-};
-
 const initialState = {
   loading: false,
   companyGeoFences: [],
   fetch_fences_error: '',
-  center: { lat: 8, lng: 7 } as LatLng,
+  center: { lat: 8, lng: 7 },
   mapLayers: [],
+  polygons: [],
+  editMode: true,
 } as GeoStateType;
 
 const geoSlice = createSlice({
   name: 'geoSlice',
   initialState,
   reducers: {
-    setMapLayers: (state, action) => {
-      state.mapLayers = action.payload;
+    setMapLayers: (
+      state,
+      action: {
+        payload: { id: number; latlngs: Array<{ lat: number; lng: number }> }[];
+      }
+    ) => {
+      state.mapLayers = [...state.mapLayers, ...action.payload];
     },
     setCenter: (state, action) => {
       state.center = action.payload;
+    },
+    loadPolygons: (state, action) => {
+      // console.log(action.payload);
+      state.polygons = [...state.polygons, action.payload];
+    },
+    updatePolygons: (state, action) => {
+      state.polygons = [...action.payload];
     },
   },
   extraReducers: (builder) => {
@@ -119,6 +113,7 @@ const geoSlice = createSlice({
   },
 });
 
-export const { setMapLayers, setCenter } = geoSlice.actions;
+export const { setMapLayers, setCenter, loadPolygons, updatePolygons } =
+  geoSlice.actions;
 
 export default geoSlice.reducer;

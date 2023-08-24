@@ -9,6 +9,16 @@ export const getUniqueValues = (
   return [...uniqueSet];
 };
 
+export const getPolygonCenter = (arr: { lat: number; lng: number }[]) => {
+  const center = arr.reduce(
+    (acc, val) => [acc[0] + val.lat, acc[1] + val.lng],
+    [0, 0]
+  );
+  center[0] /= arr.length;
+  center[1] /= arr.length;
+  return center as [number, number];
+};
+
 // export const axiosInstance = axios.create({ withCredentials: true });
 
 // axiosInstance.interceptors.request.use(

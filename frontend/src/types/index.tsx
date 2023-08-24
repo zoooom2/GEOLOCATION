@@ -1,7 +1,7 @@
 //Axios Request Types
 // export type AxiosResponseType = Awaited<ReturnType<typeof axios.get>>['data'];
 
-import { LatLng } from 'leaflet';
+// import { LatLng } from 'leaflet';
 
 // import { SyntheticEvent } from 'react';
 // import { IconType } from 'react-icons';
@@ -35,15 +35,42 @@ export type UserStateType = {
   authentication_error: string;
   fetch_fences_error: string;
   user: UserType;
-  companyGeoFences: {
-    uid: number;
-    vertices: { type: 'Polygon'; coordinates: LatLng[] };
-    center: { type: 'Point'; coordinates: LatLng };
-  }[];
   imageFile: {
     file?: File;
     filePreview?: string;
   };
+};
+
+export type GeoStateType = {
+  loading: boolean;
+  companyGeoFences: {
+    uid: string;
+    vertices: {
+      type: 'Polygon';
+      coordinates: [number, number][];
+    };
+    center: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+  }[];
+  fetch_fences_error: string;
+  center: { lat: number; lng: number };
+  mapLayers: Array<{
+    id: number;
+    latlngs: Array<{ lat: number; lng: number }>;
+  }>;
+  // polygons: Array<{
+  //   center: { lat: number; lng: number };
+  //   vertices: Array<{ lat: number; lng: number }>;
+  //   uid: string;
+  // }>;
+  polygons: {
+    center: { lat: number; lng: number };
+    vertices: { lat: number; lng: number }[];
+    uid: string;
+  }[];
+  editMode: boolean;
 };
 
 // export type userActionType = {

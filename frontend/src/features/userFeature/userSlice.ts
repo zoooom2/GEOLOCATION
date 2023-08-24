@@ -60,12 +60,6 @@ export const signup = createAsyncThunk(
   }
 );
 
-// export const fetchFences = createAsyncThunk('user/fetchFences', async () => {
-//   const response = await axios.get(`http://localhost:2705/api/v1/location/`);
-//   console.log(response.data);
-//   return response.data;
-// });
-
 const initialState = {
   loading: true,
   isAuthenticated: false,
@@ -88,7 +82,6 @@ const initialState = {
     currentLocation: '',
     locationHistory: [],
   },
-  companyGeoFences: [],
   imageFile: {
     file: undefined,
     filePreview: undefined,
@@ -210,20 +203,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.authentication_error = action.error.message as string;
       });
-    // builder
-    //   .addCase(fetchFences.pending, (state) => {
-    //     state.loading = true;
-    //     state.fetch_fences_error = '';
-    //   })
-    //   .addCase(fetchFences.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.companyGeoFences = [...action.payload];
-    //   })
-    //   .addCase(fetchFences.rejected, (state, action) => {
-    //     state.loading = false;
-    //     state.companyGeoFences = [];
-    //     state.fetch_fences_error = action.error.message as string;
-    //   });
   },
 });
 
