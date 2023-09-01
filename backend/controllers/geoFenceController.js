@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 const turf = require('@turf/turf');
 const Geofence = require('../models/geoFenceModel');
 const User = require('../models/userModel');
