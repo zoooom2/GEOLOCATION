@@ -70,7 +70,7 @@ export type GeoStateType = {
     vertices: { lat: number; lng: number }[];
     uid: string;
   }[];
-  editMode: boolean;
+  mode: 'normal' | 'edit' | 'delete';
 };
 
 // export type userActionType = {

@@ -69,7 +69,7 @@ const initialState = {
   center: { lat: 8, lng: 7 },
   mapLayers: [],
   polygons: [],
-  editMode: true,
+  mode: 'normal',
 } as GeoStateType;
 
 const geoSlice = createSlice({
@@ -113,7 +113,7 @@ const geoSlice = createSlice({
   },
 });
 
-export const { setMapLayers, setCenter, loadPolygons, updatePolygons } =
+export const { setMapLayers, setCenter, updatePolygons, loadPolygons } =
   geoSlice.actions;
 
 export default geoSlice.reducer;

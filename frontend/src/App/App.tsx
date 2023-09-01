@@ -7,19 +7,19 @@ import '../App.css';
 import LoginPage from '../page/LoginPage';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { fetchProfile } from '../features/userFeature/userSlice';
-import { fetchFences, setCenter } from '../features/geoFeatures/geoSlice';
+import { setCenter } from '../features/geoFeatures/geoSlice';
 import GoogleMap from '../components/googleMap';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const { user } = useAppSelector((state) => state.user);
-  const { companyGeoFences } = useAppSelector((state) => state.geo);
+  // const { companyGeoFences } = useAppSelector((state) => state.geo);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchProfile())
-      .then(() => dispatch(fetchFences()))
+      // .then(() => dispatch(fetchFences()))
       .then(() => {
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(

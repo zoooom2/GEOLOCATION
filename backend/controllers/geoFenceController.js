@@ -70,8 +70,10 @@ exports.checkLocation = async (data) => {
     ),
   );
 
-  console.log(insidePerimeters);
+  // console.log(insidePerimeters);
   // // return insidePerimeters;
+  // console.log(data.user);
+  // console.log(data.user.currentLocation)
   if (insidePerimeters[0] && !data.user.currentLocation) {
     // state user location and update location history
     await User.findByIdAndUpdate(data.user._id, {
@@ -90,8 +92,9 @@ exports.checkLocation = async (data) => {
     });
   } else if (
     insidePerimeters[0] &&
-    data.user.currentLocation !== insidePerimeters[0]._id
+    data.user.currentLocation !== insidePerimeters[0]._id.toString()
   ) {
+    console.log(data.user.currentLocation, insidePerimeters[0]._id);
     // check if the user is in a Geofence and it isnt thesame as the one hes still checked into
     // check him out of the current location
     await User.findByIdAndUpdate(
@@ -127,6 +130,7 @@ exports.checkLocation = async (data) => {
     //add him to users in new location
     // check him into new location
   } else if (!insidePerimeters[0] && data.user.currentLocation) {
+    console.log('not inside any territory');
     //if the user is not in any GeoFence but his current location is pointing to a GeoFence
 
     // change the user current location to null and check him out of that current location
