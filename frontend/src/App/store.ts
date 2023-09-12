@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '../features/userFeature/userSlice';
+import geoReducer from '../features/geoFeatures/geoSlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer,
+    geo: geoReducer,
   },
 });
 

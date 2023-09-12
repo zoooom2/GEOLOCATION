@@ -50,12 +50,12 @@ const userSchema = new Schema({
     minlength: 8,
     select: false,
   },
-  currentLocation: { type: ObjectId, ref: 'GeoFence' }, // to know where the user is currently
+  currentLocation: { type: ObjectId, ref: 'GeoFence', default: null }, // to know where the user is currently
   locationHistory: [
     {
       location: { type: ObjectId, ref: 'GeoFence' },
-      checkInTime: { type: Date, required: true, default: Date.now() },
-      checkOutTime: { type: Date, required: true, default: Date.now() },
+      checkInTime: { type: Date, required: true },
+      checkOutTime: { type: Date, required: true },
     },
   ],
   passwordConfirm: {

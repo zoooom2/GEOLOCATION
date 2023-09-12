@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const { Schema, model, ObjectId } = mongoose;
 
 const geoFenceSchema = new Schema({
-  uid: { type: Number, required: true }, //leaflet_id
   polygon: {
     vertices: {
       type: {

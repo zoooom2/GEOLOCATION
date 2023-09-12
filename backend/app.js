@@ -16,7 +16,7 @@ const userRouter = require('./routes/userRoute');
 const clientRouter = require('./routes/clientRoutes');
 const geoRouter = require('./routes/geoRoutes');
 
-require('./controllers/passport')(passport);
+// require('./controllers/passport')(passport);
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -29,7 +29,7 @@ const app = express();
 // Implement CORS
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: `${process.env.CLIENT_URL}`,
     methods: 'GET,POST,PATCH,DELETE',
     credentials: true,
   }),
