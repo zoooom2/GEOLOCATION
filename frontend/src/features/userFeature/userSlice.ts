@@ -72,6 +72,7 @@ const initialState = {
   fetch_user_error: '',
   visitor_count_error: '',
   fetch_fences_error: '',
+  position: { lng: 0, lat: 0 },
   user: {
     _id: '',
     firstname: '',
@@ -124,6 +125,13 @@ const userSlice = createSlice({
     },
     googleAuth: () => {
       window.open(`https://maxfence.onrender.com/api/v1/auth/google/`, '_self');
+    },
+    updatePosition: (
+      state,
+      action: { type: string; payload: Record<'lat' | 'lng', number> }
+    ) => {
+      state.position.lat = action.payload.lat;
+      state.position.lng = action.payload.lng;
     },
   },
   extraReducers: (builder) => {
@@ -215,5 +223,6 @@ export const {
   removeImage,
   googleAuth,
   stopLoading,
+  updatePosition,
 } = userSlice.actions;
 export default userSlice.reducer;

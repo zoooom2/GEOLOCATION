@@ -6,13 +6,16 @@ import { io, Socket } from 'socket.io-client';
 import '../App.css';
 import LoginPage from '../page/LoginPage';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { fetchProfile } from '../features/userFeature/userSlice';
+import {
+  fetchProfile,
+  updatePosition,
+} from '../features/userFeature/userSlice';
 import { setCenter } from '../features/geoFeatures/geoSlice';
 import GoogleMap from '../components/googleMap';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const { user } = useAppSelector((state) => state.user);
+  const { user, position } = useAppSelector((state) => state.user);
   // const { companyGeoFences } = useAppSelector((state) => state.geo);
 
   const dispatch = useAppDispatch();
@@ -58,6 +61,7 @@ function App() {
         (position) => {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
+          dispatch(updatePosition({ lat: latitude, lng: longitude }));
           socket.emit('locationUpdate', {
             latitude,
             longitude,
@@ -88,6 +92,9 @@ function App() {
         {/* <Route path='/' element={<GeoMap />} /> */}
         <Route path='/auth/' element={<LoginPage />} />
       </Routes>
+      <div>
+        lat:{position.lat} lng:{position.lng}
+      </div>
     </Router>
   );
 }
