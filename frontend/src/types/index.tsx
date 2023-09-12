@@ -34,6 +34,7 @@ export type UserStateType = {
   isAuthenticated: boolean;
   authentication_error: string;
   fetch_fences_error: string;
+  position: Record<'lat' | 'lng', number>;
   user: UserType;
   imageFile: {
     file?: File;
