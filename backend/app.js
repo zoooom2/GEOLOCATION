@@ -23,7 +23,7 @@ const globalErrorHandler = require('./controllers/errorController');
 // Start express app
 const app = express();
 
-// app.enable('trust proxy');
+app.enable('trust proxy');
 
 // 1) GLOBAL MIDDLEWARES
 // Implement CORS
@@ -59,7 +59,7 @@ app.use(
       touchAfter: 24 * 3600, //24 hours
     }),
     cookie: {
-      // secure: true,
+      secure: true,
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 360000,

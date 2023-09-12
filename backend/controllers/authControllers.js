@@ -19,8 +19,8 @@ const createSendToken = (user, statusCode, req, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    sameSite: 'lax',
-    // secure: true,
+    sameSite: 'none',
+    secure: true,
   });
 
   // Remove password from output
