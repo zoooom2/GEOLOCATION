@@ -86,7 +86,7 @@ function App() {
       <Routes>
         <Route path='/' element={<GoogleMap />} />
         {/* <Route path='/' element={<GeoMap />} /> */}
-        <Route path='/auth' element={<LoginPage />} />
+        <Route path='/auth/' element={<LoginPage />} />
       </Routes>
     </Router>
   );
