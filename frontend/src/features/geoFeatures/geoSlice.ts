@@ -13,7 +13,7 @@ export const createFence = createAsyncThunk(
     vertices: Array<[number, number]>;
   }) => {
     const response = await axios.post(
-      'http://localhost:2705/api/v1/location/',
+      'https://maxfence.onrender.com/api/v1/location/',
       {
         polygon: {
           vertices: { type: 'Polygon', coordinates: vertices },
@@ -26,7 +26,9 @@ export const createFence = createAsyncThunk(
 );
 
 export const fetchFences = createAsyncThunk('geo/fetchFences', async () => {
-  const response = await axios.get(`http://localhost:2705/api/v1/location/`);
+  const response = await axios.get(
+    `https://maxfence.onrender.com/api/v1/location/`
+  );
 
   return response.data;
 });
@@ -43,7 +45,7 @@ export const updateFenceByUID = createAsyncThunk(
     vertices: [[number, number]];
   }) => {
     const response = await axios.patch(
-      `http://localhost:2705/api/v1/location/${uid}`,
+      `https://maxfence.onrender.com/api/v1/location/${uid}`,
       {
         center,
         vertices,
@@ -56,7 +58,7 @@ export const deleteFenceByUID = createAsyncThunk(
   'geo/deleteFenceByUID',
   async ({ uid }: { uid: string }) => {
     const response = await axios.delete(
-      `http://localhost:2705/api/v1/location/${uid}`
+      `https://maxfence.onrender.com/api/v1/location/${uid}`
     );
     return response.data;
   }

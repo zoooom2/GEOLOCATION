@@ -6,7 +6,9 @@ import { FieldValues } from 'react-hook-form';
 import { UserStateType, UserType } from '../../types';
 
 export const fetchProfile = createAsyncThunk('user/fetchProfile', async () => {
-  const response = await axios.get(`http://localhost:2705/api/v1/users/me`);
+  const response = await axios.get(
+    `https://maxfence.onrender.com/api/v1/users/me`
+  );
   return response.data.data;
 });
 
@@ -16,7 +18,7 @@ export const checkVisitorCount = createAsyncThunk(
     if (!Cookies.get('visited')) {
       Cookies.set('visited', 'true', { expires: 1 });
       const response = await axios.patch(
-        `${import.meta.env.BASE_URL}/api/v1/visitor`
+        `https://maxfence.onrender.com/api/v1/visitor`
       );
       return response.data.doc.count;
     }
@@ -25,7 +27,7 @@ export const checkVisitorCount = createAsyncThunk(
 
 export const logOut = createAsyncThunk('user/logOut', async () => {
   const response = await axios.get(
-    `${import.meta.env.BASE_URL}/api/v1/users/logout`
+    `https://maxfence.onrender.com/api/v1/users/logout`
   );
   return response.data.status;
 });
@@ -36,7 +38,7 @@ export const jwtAuth = createAsyncThunk(
   'user/jwtAuth',
   async ([email, password]: string[]) => {
     const response = await axios.post(
-      `http://localhost:2705/api/v1/users/login`,
+      `https://maxfence.onrender.com/api/v1/users/login`,
       {
         email,
         password,
@@ -53,7 +55,7 @@ export const signup = createAsyncThunk(
   'user/signup',
   async (data: FieldValues) => {
     const response = await axios.post(
-      `${import.meta.env.BASE_URL}/api/v1/users/signup`,
+      `https://maxfence.onrender.com/api/v1/users/signup`,
       data
     );
     return response.data.user;
@@ -121,7 +123,7 @@ const userSlice = createSlice({
       state.imageFile = { ...initialState.imageFile };
     },
     googleAuth: () => {
-      window.open(`${import.meta.env.BASE_URL}/api/v1/auth/google/`, '_self');
+      window.open(`https://maxfence.onrender.com/api/v1/auth/google/`, '_self');
     },
   },
   extraReducers: (builder) => {

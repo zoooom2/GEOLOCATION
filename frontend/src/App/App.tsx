@@ -41,7 +41,7 @@ function App() {
         }
       })
       .then(() => {
-        const newSocket = io('http://localhost:2705/');
+        const newSocket = io('https://maxfence.onrender.com');
         setSocket(newSocket);
         return () => {
           newSocket.disconnect();
