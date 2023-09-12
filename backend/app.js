@@ -16,7 +16,7 @@ const userRouter = require('./routes/userRoute');
 const clientRouter = require('./routes/clientRoutes');
 const geoRouter = require('./routes/geoRoutes');
 
-require('./controllers/passport')(passport);
+// require('./controllers/passport')(passport);
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
