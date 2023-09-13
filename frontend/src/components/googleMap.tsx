@@ -213,6 +213,7 @@ const GMap = () => {
       zoom={17}
       center={centerCoord}
       mapContainerClassName='map-container'
+      options={{ gestureHandling: 'greedy' }}
       mapContainerStyle={{ width: '100vw', height: '70vh' }}>
       <MarkerF position={centerCoord} />
       {polygons.map(({ vertices, uid }, i) => {
