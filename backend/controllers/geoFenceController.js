@@ -70,7 +70,7 @@ exports.checkLocation = async (data) => {
     ),
   );
 
-  // console.log(insidePerimeters);
+  console.log(insidePerimeters);
   // // return insidePerimeters;
   // console.log(data.user);
   // console.log(data.user.currentLocation)
