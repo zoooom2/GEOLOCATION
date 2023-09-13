@@ -75,6 +75,7 @@ exports.checkLocation = async (data) => {
   // console.log(data.user);
   // console.log(data.user.currentLocation)
   if (insidePerimeters[0] && !data.user.currentLocation) {
+    console.log('first timer');
     // state user location and update location history
     await User.findByIdAndUpdate(data.user._id, {
       currentLocation: insidePerimeters[0]._id,
@@ -94,7 +95,7 @@ exports.checkLocation = async (data) => {
     insidePerimeters[0] &&
     data.user.currentLocation !== insidePerimeters[0]._id.toString()
   ) {
-    console.log(data.user.currentLocation, insidePerimeters[0]._id);
+    console.log('different current location from the perimeter own');
     // check if the user is in a Geofence and it isnt thesame as the one hes still checked into
     // check him out of the current location
     await User.findByIdAndUpdate(
