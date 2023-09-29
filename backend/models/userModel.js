@@ -55,7 +55,7 @@ const userSchema = new Schema({
     {
       location: { type: ObjectId, ref: 'GeoFence' },
       checkInTime: { type: Date, required: true },
-      checkOutTime: { type: Date, required: true },
+      checkOutTime: { type: Date, required: true, default: null },
     },
   ],
   passwordConfirm: {
