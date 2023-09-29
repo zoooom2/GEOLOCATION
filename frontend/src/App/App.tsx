@@ -16,7 +16,7 @@ import GoogleMap from '../components/googleMap';
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const { user, position } = useAppSelector((state) => state.user);
-  // const { companyGeoFences } = useAppSelector((state) => state.geo);
+  const { companyGeoFences } = useAppSelector((state) => state.geo);
 
   const dispatch = useAppDispatch();
 
@@ -94,6 +94,7 @@ function App() {
       </Routes>
       <div>
         lat:{position.lat} lng:{position.lng}
+        fence:{companyGeofences}
       </div>
     </Router>
   );
