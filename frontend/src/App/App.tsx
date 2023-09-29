@@ -94,7 +94,7 @@ function App() {
       </Routes>
       <div>
         lat:{position.lat} lng:{position.lng}
-        fence:{companyGeofences}
+        fence:{companyGeoFences.toString()}
       </div>
     </Router>
   );
