@@ -47,9 +47,9 @@ const GMap = () => {
   const centerCoord = useMemo(() => center, [center]);
   const polyArray = useRef(new Map());
 
-  useEffect(() => {
-    if (companyGeoFences.length < 1) dispatch(fetchFences());
-  }, []);
+  // useEffect(() => {
+  //   if (companyGeoFences.length < 1) dispatch(fetchFences());
+  // }, []);
 
   // const onUnmount = useCallback(() => {
   //   polyArray.current.forEach((data) => {
@@ -81,6 +81,7 @@ const GMap = () => {
   );
 
   const onLoad = useCallback(async () => {
+    await dispatch(fetchFences());
     const polygonArray: {
       vertices: { lat: number; lng: number }[];
       center: { lat: number; lng: number };
