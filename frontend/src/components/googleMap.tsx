@@ -131,7 +131,7 @@ const GMap = () => {
       });
     });
     setPolygonArray(polygonArray);
-    // dispatch(updatePolygons(polygonArray));
+    // dispatch(updatePolygons(polygonArray))
   }, [companyGeoFences, dispatch]);
 
   useEffect(() => {
