@@ -138,7 +138,7 @@ const GMap = () => {
 
   useEffect(() => {
     onLoad();
-  }, []);
+  }, [onLoad]);
 
   console.log(polygonArray);
 
