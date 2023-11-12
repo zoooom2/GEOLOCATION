@@ -133,12 +133,14 @@ const GMap = () => {
     setPolygonArray(polygonArray);
     //nn'
 
-    // dispatch(updatePolygons(polygonArray))
+    // dispatch(updatePolygons(polygonArray));
   }, [companyGeoFences, dispatch]);
 
   useEffect(() => {
     onLoad();
   }, []);
+
+  console.log(polygonArray);
 
   useEffect(() => {
     dispatch(updatePolygons(polygonArray));
