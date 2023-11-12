@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useEffect, useRef, Fragment } from 'react';
 import {
   GoogleMap,
-  useLoadScript,
+  // useLoadScript,
   MarkerF,
   DrawingManagerF,
   // Libraries,
@@ -16,7 +16,7 @@ import {
   fetchFences,
 } from '../features/geoFeatures/geoSlice';
 import { getPolygonCenter } from '../utils/helpers';
-import { libraries } from '../utils/constants';
+// import { libraries } from '../utils/constants';
 
 const GMap = () => {
   const {
@@ -28,10 +28,10 @@ const GMap = () => {
   const dispatch = useAppDispatch();
 
   // const libraries = useMemo(() => ['drawing'], []) as Libraries;
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: '',
-    libraries: libraries,
-  });
+  // const { isLoaded } = useLoadScript({
+  //   googleMapsApiKey: '',
+  //   libraries: libraries,
+  // });
 
   const polygonOptions = {
     strokeColor: 'yellow',
@@ -210,7 +210,7 @@ const GMap = () => {
     []
   );
 
-  if (!isLoaded) return <div>Loading...</div>;
+  // if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <GoogleMap
