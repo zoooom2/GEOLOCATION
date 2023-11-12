@@ -81,6 +81,7 @@ const GMap = () => {
   );
 
   const onLoad = useCallback(async () => {
+    console.log('onLoad');
     await dispatch(fetchFences());
     const polygonArray: {
       vertices: { lat: number; lng: number }[];
@@ -214,6 +215,7 @@ const GMap = () => {
 
   return (
     <GoogleMap
+      onLoad={onLoad}
       zoom={17}
       center={centerCoord}
       mapContainerClassName='map-container'
