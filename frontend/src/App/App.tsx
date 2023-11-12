@@ -11,7 +11,7 @@ import {
   updatePosition,
 } from '../features/userFeature/userSlice';
 import { setCenter } from '../features/geoFeatures/geoSlice';
-import GoogleMap from '../components/googleMap';
+// import GoogleMap from '../components/googleMap';
 import MainGMap from '../components/MainGMap';
 
 function App() {
