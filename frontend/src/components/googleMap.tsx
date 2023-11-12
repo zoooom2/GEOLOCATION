@@ -1,4 +1,11 @@
-import { useCallback, useMemo, useEffect, useRef, Fragment } from 'react';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  Fragment,
+} from 'react';
 import {
   GoogleMap,
   useLoadScript,
@@ -26,6 +33,13 @@ const GMap = () => {
     mode = 'normal',
   } = useAppSelector((state) => state.geo);
   const dispatch = useAppDispatch();
+  const [polygonArray, setPolygonArray] = useState<
+    {
+      vertices: { lat: number; lng: number }[];
+      center: { lat: number; lng: number };
+      uid: string;
+    }[]
+  >([]);
 
   // const libraries = useMemo(() => ['drawing'], []) as Libraries;
   const { isLoaded } = useLoadScript({
@@ -83,11 +97,12 @@ const GMap = () => {
   const onLoad = useCallback(async () => {
     console.log('onLoad');
     await dispatch(fetchFences());
-    const polygonArray: {
-      vertices: { lat: number; lng: number }[];
-      center: { lat: number; lng: number };
-      uid: string;
-    }[] = [];
+    setPolygonArray([]);
+    // const polygonArray: {
+    //   vertices: { lat: number; lng: number }[];
+    //   center: { lat: number; lng: number };
+    //   uid: string;
+    // }[] = [];
     companyGeoFences.map(({ vertices: { coordinates }, uid, center }) => {
       const path = coordinates;
       const bufferDistance = 0.00008;
@@ -115,15 +130,17 @@ const GMap = () => {
         uid,
       });
     });
-    dispatch(updatePolygons(polygonArray));
+    setPolygonArray(polygonArray);
+    // dispatch(updatePolygons(polygonArray));
   }, [companyGeoFences, dispatch]);
 
   useEffect(() => {
-    // console.log('1');
-    // if (isLoaded)
     onLoad();
-    // console.log('2');
   }, []);
+
+  useEffect(() => {
+    dispatch(updatePolygons(polygonArray));
+  }, [dispatch, polygonArray]);
 
   const handleDeletePolygon = useCallback(async (uid: string) => {
     console.log('deletes');
