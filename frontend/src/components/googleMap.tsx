@@ -123,7 +123,7 @@ const GMap = () => {
     // if (isLoaded)
     onLoad();
     // console.log('2');
-  }, []);
+  }, [companyGeoFences]);
 
   const handleDeletePolygon = useCallback(async (uid: string) => {
     console.log('deletes');
