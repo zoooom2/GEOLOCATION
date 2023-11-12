@@ -51,15 +51,15 @@ const GMap = () => {
     if (companyGeoFences.length < 1) dispatch(fetchFences());
   }, []);
 
-  const onUnmount = useCallback(() => {
-    polyArray.current.forEach((data) => {
-      const { setAtListeners, removeAtListeners, insertAtListeners } = data;
-      setAtListeners.remove();
-      removeAtListeners.remove();
-      insertAtListeners.remove();
-    });
-    polyArray.current.clear();
-  }, [polyArray]);
+  // const onUnmount = useCallback(() => {
+  //   polyArray.current.forEach((data) => {
+  //     const { setAtListeners, removeAtListeners, insertAtListeners } = data;
+  //     setAtListeners.remove();
+  //     removeAtListeners.remove();
+  //     insertAtListeners.remove();
+  //   });
+  //   polyArray.current.clear();
+  // }, [polyArray]);
 
   const onEdit = useCallback(
     (updatedPath: { lat: number; lng: number }[], index: string) => {
