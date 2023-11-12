@@ -225,7 +225,7 @@ const GMap = () => {
               onClick={() => handleDeletePolygon(uid)}
               options={polygonOptions}
               editable={false}
-              onUnmount={onUnmount}
+              // onUnmount={console.log}
             />
           </Fragment>
           //put a marker in the center of the polygon and cluster them
