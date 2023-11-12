@@ -224,7 +224,7 @@ const GMap = () => {
               paths={vertices}
               onClick={() => handleDeletePolygon(uid)}
               options={polygonOptions}
-              editable={true}
+              editable={false}
               onUnmount={onUnmount}
             />
           </Fragment>
