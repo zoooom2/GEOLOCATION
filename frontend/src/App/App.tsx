@@ -12,6 +12,7 @@ import {
 } from '../features/userFeature/userSlice';
 import { setCenter } from '../features/geoFeatures/geoSlice';
 import GoogleMap from '../components/googleMap';
+import MainGMap from '../components/MainGMap';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -88,7 +89,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<GoogleMap />} />
+        <Route path='/' element={<MainGMap />} />
         {/* <Route path='/' element={<GeoMap />} /> */}
         <Route path='/auth/' element={<LoginPage />} />
       </Routes>
