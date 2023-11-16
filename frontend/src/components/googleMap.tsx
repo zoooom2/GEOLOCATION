@@ -122,7 +122,7 @@ const GMap = () => {
 
   useEffect(() => {
     onLoad();
-  }, []);
+  }, [onLoad]);
 
   const handleDeletePolygon = useCallback(async (uid: string) => {
     console.log('deletes');
