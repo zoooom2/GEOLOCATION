@@ -117,8 +117,8 @@ const GMap = () => {
   }, [companyGeoFences, dispatch]);
 
   useEffect(() => {
-    if (isLoaded) onLoad();
-  }, [isLoaded]);
+    onLoad();
+  }, [onLoad]);
 
   const handleDeletePolygon = useCallback(async (uid: string) => {
     console.log('deletes');
