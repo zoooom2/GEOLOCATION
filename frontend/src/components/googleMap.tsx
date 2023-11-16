@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useEffect, useRef, Fragment } from 'react';
 import {
   GoogleMap,
-  // useLoadScript,
+  useLoadScript,
   MarkerF,
   DrawingManagerF,
   // Libraries,
@@ -16,7 +16,7 @@ import {
   fetchFences,
 } from '../features/geoFeatures/geoSlice';
 import { getPolygonCenter } from '../utils/helpers';
-// import { libraries } from '../utils/constants';
+import { libraries } from '../utils/constants';
 
 const GMap = () => {
   const {
@@ -28,10 +28,10 @@ const GMap = () => {
   const dispatch = useAppDispatch();
 
   // const libraries = useMemo(() => ['drawing'], []) as Libraries;
-  // const { isLoaded } = useLoadScript({
-  //   googleMapsApiKey: '',
-  //   libraries: libraries,
-  // });
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: '',
+    libraries: libraries,
+  });
 
   const polygonOptions = {
     strokeColor: 'yellow',
@@ -47,19 +47,19 @@ const GMap = () => {
   const centerCoord = useMemo(() => center, [center]);
   const polyArray = useRef(new Map());
 
-  // useEffect(() => {
-  //   if (companyGeoFences.length < 1) dispatch(fetchFences());
-  // }, []);
+  useEffect(() => {
+    if (companyGeoFences.length < 1) dispatch(fetchFences());
+  }, []);
 
-  // const onUnmount = useCallback(() => {
-  //   polyArray.current.forEach((data) => {
-  //     const { setAtListeners, removeAtListeners, insertAtListeners } = data;
-  //     setAtListeners.remove();
-  //     removeAtListeners.remove();
-  //     insertAtListeners.remove();
-  //   });
-  //   polyArray.current.clear();
-  // }, [polyArray]);
+  const onUnmount = useCallback(() => {
+    polyArray.current.forEach((data) => {
+      const { setAtListeners, removeAtListeners, insertAtListeners } = data;
+      setAtListeners.remove();
+      removeAtListeners.remove();
+      insertAtListeners.remove();
+    });
+    polyArray.current.clear();
+  }, [polyArray]);
 
   const onEdit = useCallback(
     (updatedPath: { lat: number; lng: number }[], index: string) => {
@@ -81,9 +81,6 @@ const GMap = () => {
   );
 
   const onLoad = useCallback(async () => {
-    console.log('onLoad');
-    await dispatch(fetchFences());
-
     const polygonArray: {
       vertices: { lat: number; lng: number }[];
       center: { lat: number; lng: number };
@@ -116,13 +113,12 @@ const GMap = () => {
         uid,
       });
     });
-
     dispatch(updatePolygons(polygonArray));
   }, [companyGeoFences, dispatch]);
 
   useEffect(() => {
-    onLoad();
-  }, [onLoad]);
+    if (isLoaded) onLoad();
+  }, [isLoaded]);
 
   const handleDeletePolygon = useCallback(async (uid: string) => {
     console.log('deletes');
@@ -210,11 +206,10 @@ const GMap = () => {
     []
   );
 
-  // if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <GoogleMap
-      onLoad={onLoad}
       zoom={17}
       center={centerCoord}
       mapContainerClassName='map-container'
@@ -229,8 +224,8 @@ const GMap = () => {
               paths={vertices}
               onClick={() => handleDeletePolygon(uid)}
               options={polygonOptions}
-              editable={false}
-              // onUnmount={console.log}
+              editable={true}
+              onUnmount={onUnmount}
             />
           </Fragment>
           //put a marker in the center of the polygon and cluster them
